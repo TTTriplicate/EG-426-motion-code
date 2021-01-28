@@ -1,15 +1,15 @@
 #include "Encoders.h"
 
-InterruptIn motorRgt(p18);
-InterruptIn motorLft(p17);
+InterruptIn motorRgt(RIGHT_PIN);
+InterruptIn motorLft(LEFT_PIN);
 
 
 
 int cntA;
 int cntB;
 
-bool dirA;
-bool dirB;
+bool dirA = 1;
+bool dirB = 1;
 
 
 

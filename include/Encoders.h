@@ -1,7 +1,10 @@
 #ifndef Encoders_h
 #define Encoders_h
+#include <mbed.h>
 
-#include "mbed.h"
+#define RIGHT_PIN D4
+#define LEFT_PIN D5
+
 
 class Encoders
 {
