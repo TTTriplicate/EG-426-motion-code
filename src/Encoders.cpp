@@ -58,6 +58,11 @@ void Encoders::resetB()
     cntB=0;
     }
 
+void Encoders::resetAll(){
+    resetA();
+    resetB();
+}
+
 Encoders::Encoders()
 {
 cntA = 0;

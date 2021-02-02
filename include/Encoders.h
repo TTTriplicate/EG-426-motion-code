@@ -16,6 +16,7 @@ class Encoders
 
   void resetA();
   void resetB();
+  void resetAll();
 
   Encoders();
 
