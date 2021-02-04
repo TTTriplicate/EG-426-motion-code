@@ -15,20 +15,20 @@ void output()
 }
 
 void driveStraightDist(int dist);
-void turnDegreesLeft(float radians);
+void turnRadiansLeft(float radians);
 
 int main()
 {
-    int distanceInMm = 1000;
+    int distanceInMm[2] = {1194, 872};
     float turnRadians = (M_PI/2);
+    output();
+    ThisThread::sleep_for(3s);
     while (1)
     {
-        driveStraightDist(distanceInMm);
-        ThisThread::sleep_for(10s);
-        hall_sensor.resetAll();
-        turnDegreesLeft(turnRadians);
-        ThisThread::sleep_for(10s);
-        hall_sensor.resetAll();
+        driveStraightDist(distanceInMm[0]);
+        turnRadiansLeft(turnRadians);
+        driveStraightDist(distanceInMm[1]);
+        turnRadiansLeft(turnRadians);
     }
     //output();
 }
@@ -41,13 +41,16 @@ void driveStraightDist(int dist)
     printf("Pole swaps: \t%d\n", polaritySwaps);
     while ((hall_sensor.get_countA() + hall_sensor.get_countB()) / 2 < polaritySwaps)
     {
-        robo.drive(.4);
+        robo.drive(.45);
         ThisThread::sleep_for(100);
         output();
     }
     robo.stop();
+            ThisThread::sleep_for(10s);
+        hall_sensor.resetAll();
+
 }
-void turnDegreesLeft(float radians)
+void turnRadiansLeft(float radians)
 {
     int wheelDiameterMm = 66;
     float arcLength = radians * (182/2);
@@ -56,9 +59,12 @@ void turnDegreesLeft(float radians)
     int polaritySwaps = (rotations * 192);
     printf("Pole swaps for turn: \t%d\n", polaritySwaps);
     while(hall_sensor.get_countA() < polaritySwaps){
-        robo.leftFWD(.4);
+        robo.leftFWD(.45);
         ThisThread::sleep_for(100);
         output();
     }
     robo.stop();
+            ThisThread::sleep_for(10s);
+        hall_sensor.resetAll();
+
 }
