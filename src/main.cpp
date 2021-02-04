@@ -24,17 +24,22 @@ int main()
     float turnRadians = (M_PI / 2);
     output();
     ThisThread::sleep_for(3s);
-    driveStraightDist(distanceInMm[0]);
-    turnRadiansRight(turnRadians);
-    driveStraightDist(distanceInMm[1]);
-    turnRadiansRight(turnRadians);
-    ThisThread::sleep_for(10s);//reset for right hand test
+    for (int i = 0; i < 2; i++)
+    {
+        driveStraightDist(distanceInMm[0]);
+        turnRadiansRight(turnRadians);
+        driveStraightDist(distanceInMm[1]);
+        turnRadiansRight(turnRadians);
+    }
+    ThisThread::sleep_for(10s); //reset for right hand test
 
-    driveStraightDist(distanceInMm[0], false);
-    turnRadiansLeft(turnRadians);
-    driveStraightDist(distanceInMm[1], false);
-    turnRadiansLeft(turnRadians);
-
+    for (int i = 0; i < 2; i++)
+    {
+        driveStraightDist(distanceInMm[0], false);
+        turnRadiansLeft(turnRadians);
+        driveStraightDist(distanceInMm[1], false);
+        turnRadiansLeft(turnRadians);
+    }
 }
 
 void driveStraightDist(int dist, bool first)
@@ -45,7 +50,7 @@ void driveStraightDist(int dist, bool first)
     printf("Pole swaps: \t%d\n", polaritySwaps);
     while ((first ? hall_sensor.get_countB() : hall_sensor.get_countA()) < polaritySwaps)
     {
-        robo.drive(.45);
+        robo.drive(.5);
         ThisThread::sleep_for(10);
         output();
     }
@@ -63,7 +68,7 @@ void turnRadiansRight(float radians)
     printf("Pole swaps for turn: \t%d\n", polaritySwaps);
     while (hall_sensor.get_countA() < polaritySwaps)
     {
-        robo.leftFWD(.45);
+        robo.leftFWD(.5);
         ThisThread::sleep_for(10);
         output();
     }
@@ -82,7 +87,7 @@ void turnRadiansLeft(float radians)
     printf("Pole swaps for turn: \t%d\n", polaritySwaps);
     while (hall_sensor.get_countB() < polaritySwaps)
     {
-        robo.rightFWD(.45);
+        robo.rightFWD(.5);
         ThisThread::sleep_for(10);
         output();
     }
@@ -90,4 +95,3 @@ void turnRadiansLeft(float radians)
     ThisThread::sleep_for(10s);
     hall_sensor.resetAll();
 }
-

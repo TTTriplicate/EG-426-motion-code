@@ -3,7 +3,7 @@
 
 #include <mbed.h>
 
-#define    DEFAULT_SPEED    0.25
+#define    DEFAULT_SPEED    0.5
 #define    LOW       0
 #define    HIGH      1
 #define LEFT_PIN PTE20
