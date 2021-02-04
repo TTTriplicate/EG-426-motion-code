@@ -30,20 +30,20 @@ int main()
     turnRadiansRight(turnRadians);
     ThisThread::sleep_for(10s);//reset for right hand test
 
-    driveStraightDist(distanceInMm[0]);
+    driveStraightDist(distanceInMm[0], false);
     turnRadiansLeft(turnRadians);
-    driveStraightDist(distanceInMm[1]);
+    driveStraightDist(distanceInMm[1], false);
     turnRadiansLeft(turnRadians);
 
 }
 
-void driveStraightDist(int dist)
+void driveStraightDist(int dist, bool first = true)
 {
     int wheelDiameterMm = 66;
     float rotations = (dist / (wheelDiameterMm * M_PI));
     int polaritySwaps = (rotations * 192);
     printf("Pole swaps: \t%d\n", polaritySwaps);
-    while ((hall_sensor.get_countA() + hall_sensor.get_countB()) / 2 < polaritySwaps)
+    while ((first ? hall_sensor.get_countB() : hall_sensor.get_countA()) < polaritySwaps)
     {
         robo.drive(.45);
         ThisThread::sleep_for(10);
