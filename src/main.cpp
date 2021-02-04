@@ -14,7 +14,7 @@ void output()
     printf("hall sensor reads\n Left : %d \t Right : %d\n", hall_sensor.get_countA(), hall_sensor.get_countB());
 }
 
-void driveStraightDist(int dist);
+void driveStraightDist(int dist, bool first = true);
 void turnRadiansRight(float radians);
 void turnRadiansLeft(float radians);
 
@@ -37,7 +37,7 @@ int main()
 
 }
 
-void driveStraightDist(int dist, bool first = true)
+void driveStraightDist(int dist, bool first)
 {
     int wheelDiameterMm = 66;
     float rotations = (dist / (wheelDiameterMm * M_PI));
@@ -53,7 +53,7 @@ void driveStraightDist(int dist, bool first = true)
     ThisThread::sleep_for(10s);
     hall_sensor.resetAll();
 }
-void turnRadiansLeft(float radians)
+void turnRadiansRight(float radians)
 {
     int wheelDiameterMm = 66;
     float arcLength = radians * (182 / 2);
@@ -72,7 +72,7 @@ void turnRadiansLeft(float radians)
     hall_sensor.resetAll();
 }
 
-void turnRadiansRight(float radians)
+void turnRadiansLeft(float radians)
 {
     int wheelDiameterMm = 66;
     float arcLength = radians * (182 / 2);
