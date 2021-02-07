@@ -22,23 +22,33 @@ int main()
 {
     int distanceInMm[2] = {1194, 872};
     float turnRadians = (M_PI / 2);
+    DigitalOut rightSignal(LED1), leftSignal(LED2);
     output();
     ThisThread::sleep_for(3s);
-    for (int i = 0; i < 2; i++)
+    while (true)
     {
-        driveStraightDist(distanceInMm[0]);
-        turnRadiansRight(turnRadians);
-        driveStraightDist(distanceInMm[1]);
-        turnRadiansRight(turnRadians);
-    }
-    ThisThread::sleep_for(10s); //reset for right hand test
+        leftSignal = 1;
+        for (int i = 0; i < 2; i++)
+        {
+            driveStraightDist(distanceInMm[0]);
+            turnRadiansRight(turnRadians);
+            driveStraightDist(distanceInMm[1]);
+            turnRadiansRight(turnRadians);
+        }
+        leftSignal = 0;
+        rightSignal = 1;
+        ThisThread::sleep_for(10s); //reset for right hand test
 
-    for (int i = 0; i < 2; i++)
-    {
-        driveStraightDist(distanceInMm[0], false);
-        turnRadiansLeft(turnRadians);
-        driveStraightDist(distanceInMm[1], false);
-        turnRadiansLeft(turnRadians);
+        for (int i = 0; i < 2; i++)
+        {
+            driveStraightDist(distanceInMm[0], false);
+            turnRadiansLeft(turnRadians);
+            driveStraightDist(distanceInMm[1], false);
+            turnRadiansLeft(turnRadians);
+        }
+        rightSignal = 0;
+        leftSignal = 1;
+        ThisThread::sleep_for(10s);
     }
 }
 
