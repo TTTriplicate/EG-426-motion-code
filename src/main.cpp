@@ -1,9 +1,18 @@
 #define _USE_MATH_DEFINES
+#define I2C_SDA D14
+#define I2C_SCL D15
+
 
 #include <mbed.h>
 #include <math.h>
 #include "Motion.h"
 #include "Encoders.h"
+#include "VL53L0X.h"
+
+I2C i2c(I2C_SDA, I2C_SCL);
+Timer timer;
+
+VL53L0X sensor( &i2c, &timer);
 
 Encoders hall_sensor;
 BufferedSerial pc(USBTX, USBRX);
@@ -20,36 +29,7 @@ void turnRadiansLeft(float radians);
 
 int main()
 {
-    int distanceInMm[2] = {1194, 872};
-    float turnRadians = (M_PI / 2);
-    DigitalOut rightSignal(LED1), leftSignal(LED2);
-    output();
-    ThisThread::sleep_for(3s);
-    while (true)
-    {
-        leftSignal = 1;
-        for (int i = 0; i < 2; i++)
-        {
-            driveStraightDist(distanceInMm[0]);
-            turnRadiansRight(turnRadians);
-            driveStraightDist(distanceInMm[1]);
-            turnRadiansRight(turnRadians);
-        }
-        leftSignal = 0;
-        rightSignal = 1;
-        ThisThread::sleep_for(10s); //reset for right hand test
 
-        for (int i = 0; i < 2; i++)
-        {
-            driveStraightDist(distanceInMm[0], false);
-            turnRadiansLeft(turnRadians);
-            driveStraightDist(distanceInMm[1], false);
-            turnRadiansLeft(turnRadians);
-        }
-        rightSignal = 0;
-        leftSignal = 1;
-        ThisThread::sleep_for(10s);
-    }
 }
 
 void driveStraightDist(int dist, bool first)
