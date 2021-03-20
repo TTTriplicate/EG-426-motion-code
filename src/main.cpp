@@ -1,18 +1,18 @@
-#define _USE_MATH_DEFINES
-#define I2C_SDA D14
-#define I2C_SCL D15
-
-
 #include <mbed.h>
 #include <math.h>
 #include "Motion.h"
 #include "Encoders.h"
 #include "VL53L0X.h"
 
+#define _USE_MATH_DEFINES
+#define I2C_SDA D14
+#define I2C_SCL D15
+
+
 I2C i2c(I2C_SDA, I2C_SCL);
 Timer timer;
 
-VL53L0X sensor( &i2c, &timer);
+VL53L0X sensor(i2c, timer);
 
 Encoders hall_sensor;
 BufferedSerial pc(USBTX, USBRX);
@@ -29,7 +29,18 @@ void turnRadiansLeft(float radians);
 
 int main()
 {
-
+    printf("Start...\r\n");
+    sensor.init(true);
+    printf("Initialisation completed!\r\n");
+    sensor.setTimeout(500);
+    while (1)
+    {
+        printf("%u\r\n", sensor.readRangeSingleMillimeters());
+        if (sensor.timeoutOccurred())
+        {
+            printf("TIMEOUT!\r\n");
+        }
+    }
 }
 
 void driveStraightDist(int dist, bool first)
