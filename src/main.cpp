@@ -34,6 +34,7 @@ int main()
     printf("Initialisation completed!\r\n");
     sensor.setTimeout(500);
     int dist = sensor.readRangeSingleMillimeters();
+    printf("%d Distance to target\n", dist);
     driveStraightDist(dist-100);
 }
 
