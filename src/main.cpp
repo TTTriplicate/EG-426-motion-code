@@ -23,7 +23,7 @@ void output()
     printf("hall sensor reads\n Left : %d \t Right : %d\n", hall_sensor.get_countA(), hall_sensor.get_countB());
 }
 
-void driveStraightDist(int dist, bool first = true);
+void driveStraightDist(int dist);
 void turnRadiansRight(float radians);
 void turnRadiansLeft(float radians);
 
@@ -33,17 +33,11 @@ int main()
     sensor.init(true);
     printf("Initialisation completed!\r\n");
     sensor.setTimeout(500);
-    while (1)
-    {
-        printf("%u\r\n", sensor.readRangeSingleMillimeters());
-        if (sensor.timeoutOccurred())
-        {
-            printf("TIMEOUT!\r\n");
-        }
-    }
+    int dist = sensor.readRangeSingleMillimeters();
+    driveStraightDist(dist-100);
 }
 
-void driveStraightDist(int dist, bool first)
+void driveStraightDist(int dist)
 {
     int wheelDiameterMm = 66;
     float rotations = (dist / (wheelDiameterMm * M_PI));
