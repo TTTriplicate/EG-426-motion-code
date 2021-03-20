@@ -62,7 +62,7 @@ void driveStraightDist(int dist, bool first)
 void turnRadiansRight(float radians)
 {
     int wheelDiameterMm = 66;
-    float arcLength = radians * (182 / 2);
+    float arcLength = radians * (182);
     printf("Arc length: \t %d\n", static_cast<int>(arcLength));
     float rotations = (arcLength / (wheelDiameterMm * M_PI));
     int polaritySwaps = (rotations * 192);
