@@ -26,19 +26,23 @@ void driveToObstacle();
 
 int main()
 {
-    while (true)
-    {
-        turnRadians((M_PI / 2), 'l');
-        ThisThread::sleep_for(3s);
-        turnRadians((M_PI / 2), 'r');
-        ThisThread::sleep_for(3s);
-    }
-    // driveToObstacle();
-    // turnRadians(M_PI / 2, 'l');
-    // driveToObstacle();
-    // turnRadians(M_PI / 2, 'r');
-    // driveToObstacle();
-    // turnRadians(M_PI, 'l');
+    // while (true)
+    // {
+    //     turnRadians((M_PI / 2), 'l');
+    //     ThisThread::sleep_for(3s);
+    //     turnRadians((M_PI / 2), 'r');
+    //     ThisThread::sleep_for(3s);
+    // }
+    driveToObstacle();
+    turnRadians(M_PI / 2, 'l');
+    driveToObstacle();
+    turnRadians(M_PI / 2, 'r');
+    driveToObstacle();
+    turnRadians(M_PI, 'l');
+    driveToObstacle();
+    turnRadians(M_PI/2, 'l');
+    driveStraightDist(1000);
+    turnRadians(2 * M_PI, 'r');
 }
 
 void output()
@@ -54,7 +58,8 @@ void driveStraightDist(int dist)
     printf("Pole swaps: \t%d\n", polaritySwaps);
     while ((hall_sensor.get_countA() + hall_sensor.get_countB()) / 2 < polaritySwaps)
     {
-        robo.drive(.25);
+        robo.leftFWD(.27);
+        robo.rightFWD(.25);
         ThisThread::sleep_for(10);
     }
     robo.stop();
@@ -137,6 +142,6 @@ void driveToObstacle()
         distance += dist[i];
     }
     distance = distance/3;
-    driveStraightDist(distance - 100);
+    driveStraightDist(distance - 150);
     delete dist;
 }
