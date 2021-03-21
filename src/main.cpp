@@ -21,17 +21,17 @@ void output();
 void driveStraightDist(int dist);
 void turnRadiansRight(float radians);
 void turnRadiansLeft(float radians);
-void turnRadiansStationary(float radians, char dir);
+void turnRadians(float radians, char dir);
 void driveToObstacle();
 
 int main()
 {
     driveToObstacle();
-    turnRadiansStationary(M_PI / 2, 'l');
+    turnRadians(M_PI / 2, 'l');
     driveToObstacle();
-    turnRadiansStationary(M_PI / 2, 'r');
+    turnRadians(M_PI / 2, 'r');
     driveToObstacle();
-    turnRadiansStationary(M_PI, 'l');
+    turnRadians(M_PI, 'l');
 }
 
 void output()
@@ -57,7 +57,7 @@ void driveStraightDist(int dist)
 void turnRadiansRight(float radians)
 {
     int wheelDiameterMm = 66;
-    float arcLength = radians * (137);
+    float arcLength = radians * (155);
     printf("Arc length: \t %d\n", static_cast<int>(arcLength));
     float rotations = (arcLength / (wheelDiameterMm * M_PI));
     int polaritySwaps = (rotations * 192);
@@ -76,7 +76,7 @@ void turnRadiansRight(float radians)
 void turnRadiansLeft(float radians)
 {
     int wheelDiameterMm = 66;
-    float arcLength = radians * (137);
+    float arcLength = radians * (155);
     printf("Arc length: \t %d\n", static_cast<int>(arcLength));
     float rotations = (arcLength / (wheelDiameterMm * M_PI));
     int polaritySwaps = (rotations * 192);
@@ -92,24 +92,22 @@ void turnRadiansLeft(float radians)
     hall_sensor.resetAll();
 }
 
-void turnRadiansStationary(float radians, char dir)
+void turnRadians(float radians, char dir)
 {
     int wheelDiameterMm = 66;
-    float arcLength = radians * (137/2);
+    float arcLength = radians * (155 / 2);
     float rotations = (arcLength / (wheelDiameterMm * M_PI));
     int polaritySwaps = (rotations * 192);
 
-    while (hall_sensor.get_countA() < polaritySwaps && hall_sensor.get_countB() < polaritySwaps)
+    while ((hall_sensor.get_countA() + hall_sensor.get_countB()) / 2 < polaritySwaps)
     {
         if (dir == 'l')
         {
-            robo.leftREV(.3);
-            robo.rightFWD(.3);
+            robo.turnLeft(.25);
         }
         else if (dir == 'r')
         {
-            robo.rightREV(.3);
-            robo.leftFWD(.3);
+            robo.turnRight(.25);
         }
         ThisThread::sleep_for(10);
     }
@@ -118,7 +116,8 @@ void turnRadiansStationary(float radians, char dir)
     hall_sensor.resetAll();
 }
 
-void driveToObstacle(){
+void driveToObstacle()
+{
     sensor.init(true);
     printf("Initialisation completed!\r\n");
     sensor.setTimeout(500);
