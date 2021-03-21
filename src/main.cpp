@@ -17,11 +17,7 @@ Encoders hall_sensor;
 BufferedSerial pc(USBTX, USBRX);
 Motion robo;
 
-void output()
-{
-    printf("hall sensor reads\n Left : %d \t Right : %d\n", hall_sensor.get_countA(), hall_sensor.get_countB());
-}
-
+void output();
 void driveStraightDist(int dist);
 void turnRadiansRight(float radians);
 void turnRadiansLeft(float radians);
@@ -34,7 +30,13 @@ int main()
     turnRadiansStationary(M_PI / 2, 'l');
     driveToObstacle();
     turnRadiansStationary(M_PI / 2, 'r');
-    driveStraightDist(1000);
+    driveToObstacle();
+    turnRadiansStationary(M_PI, 'l');
+}
+
+void output()
+{
+    printf("hall sensor reads\n Left : %d \t Right : %d\n", hall_sensor.get_countA(), hall_sensor.get_countB());
 }
 
 void driveStraightDist(int dist)
@@ -55,14 +57,14 @@ void driveStraightDist(int dist)
 void turnRadiansRight(float radians)
 {
     int wheelDiameterMm = 66;
-    float arcLength = radians * (182);
+    float arcLength = radians * (137);
     printf("Arc length: \t %d\n", static_cast<int>(arcLength));
     float rotations = (arcLength / (wheelDiameterMm * M_PI));
     int polaritySwaps = (rotations * 192);
     printf("Pole swaps for turn: \t%d\n", polaritySwaps);
     while (hall_sensor.get_countA() < polaritySwaps)
     {
-        robo.leftFWD(.275);
+        robo.leftFWD(.3);
         ThisThread::sleep_for(10);
         output();
     }
@@ -74,14 +76,14 @@ void turnRadiansRight(float radians)
 void turnRadiansLeft(float radians)
 {
     int wheelDiameterMm = 66;
-    float arcLength = radians * (182);
+    float arcLength = radians * (137);
     printf("Arc length: \t %d\n", static_cast<int>(arcLength));
     float rotations = (arcLength / (wheelDiameterMm * M_PI));
     int polaritySwaps = (rotations * 192);
     printf("Pole swaps for turn: \t%d\n", polaritySwaps);
     while (hall_sensor.get_countB() < polaritySwaps)
     {
-        robo.rightFWD(.275);
+        robo.rightFWD(.3);
         ThisThread::sleep_for(10);
         output();
     }
@@ -93,7 +95,7 @@ void turnRadiansLeft(float radians)
 void turnRadiansStationary(float radians, char dir)
 {
     int wheelDiameterMm = 66;
-    float arcLength = radians * (182/2);
+    float arcLength = radians * (137/2);
     float rotations = (arcLength / (wheelDiameterMm * M_PI));
     int polaritySwaps = (rotations * 192);
 
@@ -101,13 +103,13 @@ void turnRadiansStationary(float radians, char dir)
     {
         if (dir == 'l')
         {
-            robo.leftREV(.275);
-            robo.rightFWD(.275);
+            robo.leftREV(.3);
+            robo.rightFWD(.3);
         }
         else if (dir == 'r')
         {
-            robo.rightREV(.275);
-            robo.leftFWD(.275);
+            robo.rightREV(.3);
+            robo.leftFWD(.3);
         }
         ThisThread::sleep_for(10);
     }
