@@ -1,5 +1,6 @@
 #include <mbed.h>
 #include <math.h>
+#include <vector>
 #include "Motion.h"
 #include "Encoders.h"
 #include "VL53L0X.h"
@@ -23,26 +24,15 @@ void turnRadiansRight(float radians);
 void turnRadiansLeft(float radians);
 void turnRadians(float radians, char dir);
 void driveToObstacle();
+void findForwardGap();
+int countToDrive(int dist);
+int arcLength(float radians);
 
 int main()
 {
-    // while (true)
-    // {
-    //     turnRadians((M_PI / 2), 'l');
-    //     ThisThread::sleep_for(3s);
-    //     turnRadians((M_PI / 2), 'r');
-    //     ThisThread::sleep_for(3s);
-    // }
-    driveToObstacle();
-    turnRadians(M_PI / 2, 'l');
-    driveToObstacle();
-    turnRadians(M_PI / 2, 'r');
-    driveToObstacle();
-    turnRadians(M_PI, 'l');
-    driveToObstacle();
-    turnRadians(M_PI/2, 'l');
-    driveStraightDist(1000);
-    turnRadians(2 * M_PI, 'r');
+    ThisThread::sleep_for(3s);
+    findForwardGap();
+    driveStraightDist(1000);    
 }
 
 void output()
@@ -52,9 +42,7 @@ void output()
 
 void driveStraightDist(int dist)
 {
-    int wheelDiameterMm = 66;
-    float rotations = (dist / (wheelDiameterMm * M_PI));
-    int polaritySwaps = (rotations * 192);
+    int polaritySwaps = countToDrive(dist);
     printf("Pole swaps: \t%d\n", polaritySwaps);
     while ((hall_sensor.get_countA() + hall_sensor.get_countB()) / 2 < polaritySwaps)
     {
@@ -66,50 +54,11 @@ void driveStraightDist(int dist)
     ThisThread::sleep_for(500);
     hall_sensor.resetAll();
 }
-void turnRadiansRight(float radians)
-{
-    int wheelDiameterMm = 66;
-    float arcLength = radians * (150);
-    printf("Arc length: \t %d\n", static_cast<int>(arcLength));
-    float rotations = (arcLength / (wheelDiameterMm * M_PI));
-    int polaritySwaps = (rotations * 192);
-    printf("Pole swaps for turn: \t%d\n", polaritySwaps);
-    while (hall_sensor.get_countA() < polaritySwaps)
-    {
-        robo.leftFWD(.3);
-        ThisThread::sleep_for(10);
-        output();
-    }
-    robo.stop();
-    ThisThread::sleep_for(500);
-    hall_sensor.resetAll();
-}
-
-void turnRadiansLeft(float radians)
-{
-    int wheelDiameterMm = 66;
-    float arcLength = radians * (150);
-    printf("Arc length: \t %d\n", static_cast<int>(arcLength));
-    float rotations = (arcLength / (wheelDiameterMm * M_PI));
-    int polaritySwaps = (rotations * 192);
-    printf("Pole swaps for turn: \t%d\n", polaritySwaps);
-    while (hall_sensor.get_countB() < polaritySwaps)
-    {
-        robo.rightFWD(.3);
-        ThisThread::sleep_for(10);
-        output();
-    }
-    robo.stop();
-    ThisThread::sleep_for(500);
-    hall_sensor.resetAll();
-}
 
 void turnRadians(float radians, char dir)
 {
-    int wheelDiameterMm = 66;
-    float arcLength = radians * (150 / 2);
-    float rotations = (arcLength / (wheelDiameterMm * M_PI));
-    int polaritySwaps = (rotations * 192);
+    int arc_length = arcLength(radians);
+    int polaritySwaps = countToDrive(arc_length);
 
     while ((hall_sensor.get_countA() + hall_sensor.get_countB()) / 2 < polaritySwaps)
     {
@@ -132,16 +81,97 @@ void driveToObstacle()
 {
     sensor.init(true);
     sensor.setTimeout(500);
-    int* dist = new int[3];
-    
-    for (int i = 0; i < 3; i++){
+    int *dist = new int[3];
+
+    for (int i = 0; i < 3; i++)
+    {
         dist[i] = sensor.readRangeSingleMillimeters();
     }
     int distance;
-    for (int i = 0; i < 3; i++){
+    for (int i = 0; i < 3; i++)
+    {
         distance += dist[i];
     }
-    distance = distance/3;
+    distance = distance / 3;
     driveStraightDist(distance - 150);
     delete dist;
+}
+
+void findForwardGap()
+{
+    sensor.init(true);
+    sensor.setTimeout(500);
+    std::vector<std::pair<int, int>> distanceAndHeading;
+    int counts = countToDrive(arcLength(M_PI / 2));
+    int count = 0;
+    while (count < counts)
+    {
+        robo.leftREV(.27);
+        robo.rightFWD(.25);
+        count = (hall_sensor.get_countB() + hall_sensor.get_countA())/2;
+        int read = sensor.readRangeSingleMillimeters();
+        distanceAndHeading.push_back(std::make_pair(count * -1, read));
+        ThisThread::sleep_for(10ms);
+    }
+    robo.stop();
+    ThisThread::sleep_for(500);
+    hall_sensor.resetAll();
+    count = 0;
+    while (count < counts)
+    {
+        robo.leftFWD(.27);
+        robo.rightREV(.25);
+        count = (hall_sensor.get_countB() + hall_sensor.get_countA())/2;
+        ThisThread::sleep_for(10);
+    }
+    robo.stop();
+    ThisThread::sleep_for(500);
+    hall_sensor.resetAll();
+    count = 0;
+    while (count < counts){
+                robo.leftFWD(.27);
+        robo.rightREV(.25);
+        count = (hall_sensor.get_countB() + hall_sensor.get_countA())/2;
+        int read = sensor.readRangeSingleMillimeters();
+        distanceAndHeading.push_back(std::make_pair(count, read));
+        ThisThread::sleep_for(10ms);
+    }
+    robo.stop();
+    int maxDist = distanceAndHeading[0].first;
+    int headingCount;
+
+    for (unsigned i = 1; i < distanceAndHeading.size(); i++){
+        printf("%d : %d\n", distanceAndHeading[i].first, distanceAndHeading[i].second);
+        if (distanceAndHeading[i].first > maxDist){
+            maxDist = distanceAndHeading[i].first;
+            headingCount = distanceAndHeading[i].second;
+        }
+    }
+
+    int finalCount = (headingCount > 0 ? counts - headingCount : counts + abs(headingCount));
+    count = 0;
+        while (count < finalCount)
+    {
+        robo.leftREV(.27);
+        robo.rightFWD(.25);
+        count = (hall_sensor.get_countB() + hall_sensor.get_countA())/2;
+        ThisThread::sleep_for(10);
+    }
+    robo.stop();
+    ThisThread::sleep_for(500);
+    hall_sensor.resetAll();
+}
+
+int countToDrive(int dist)
+{
+    int wheelDiameterMm = 66;
+    float rotations = (dist / (wheelDiameterMm * M_PI));
+    int polaritySwaps = (rotations * 192);
+    return polaritySwaps;
+}
+
+int arcLength(float radians)
+{
+    int dist = radians * (150/2);
+    return dist;
 }
