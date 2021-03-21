@@ -62,7 +62,7 @@ void turnRadiansRight(float radians)
     printf("Pole swaps for turn: \t%d\n", polaritySwaps);
     while (hall_sensor.get_countA() < polaritySwaps)
     {
-        robo.leftFWD(.3);
+        robo.leftFWD(.275);
         ThisThread::sleep_for(10);
         output();
     }
@@ -81,7 +81,7 @@ void turnRadiansLeft(float radians)
     printf("Pole swaps for turn: \t%d\n", polaritySwaps);
     while (hall_sensor.get_countB() < polaritySwaps)
     {
-        robo.rightFWD(.3);
+        robo.rightFWD(.275);
         ThisThread::sleep_for(10);
         output();
     }
@@ -101,13 +101,13 @@ void turnRadiansStationary(float radians, char dir)
     {
         if (dir == 'l')
         {
-            robo.leftFWD(.3);
-            robo.rightREV(.3);
+            robo.leftREV(.275);
+            robo.rightFWD(.275);
         }
         else if (dir == 'r')
         {
-            robo.rightFWD(.3);
-            robo.leftREV(.3);
+            robo.rightREV(.275);
+            robo.leftFWD(.275);
         }
         ThisThread::sleep_for(10);
     }
