@@ -26,12 +26,19 @@ void driveToObstacle();
 
 int main()
 {
-    driveToObstacle();
-    turnRadians(M_PI / 2, 'l');
-    driveToObstacle();
-    turnRadians(M_PI / 2, 'r');
-    driveToObstacle();
-    turnRadians(M_PI, 'l');
+    while (true)
+    {
+        turnRadians((M_PI / 2), 'l');
+        ThisThread::sleep_for(3s);
+        turnRadians((M_PI / 2), 'r');
+        ThisThread::sleep_for(3s);
+    }
+    // driveToObstacle();
+    // turnRadians(M_PI / 2, 'l');
+    // driveToObstacle();
+    // turnRadians(M_PI / 2, 'r');
+    // driveToObstacle();
+    // turnRadians(M_PI, 'l');
 }
 
 void output()
@@ -57,7 +64,7 @@ void driveStraightDist(int dist)
 void turnRadiansRight(float radians)
 {
     int wheelDiameterMm = 66;
-    float arcLength = radians * (155);
+    float arcLength = radians * (150);
     printf("Arc length: \t %d\n", static_cast<int>(arcLength));
     float rotations = (arcLength / (wheelDiameterMm * M_PI));
     int polaritySwaps = (rotations * 192);
@@ -76,7 +83,7 @@ void turnRadiansRight(float radians)
 void turnRadiansLeft(float radians)
 {
     int wheelDiameterMm = 66;
-    float arcLength = radians * (155);
+    float arcLength = radians * (150);
     printf("Arc length: \t %d\n", static_cast<int>(arcLength));
     float rotations = (arcLength / (wheelDiameterMm * M_PI));
     int polaritySwaps = (rotations * 192);
@@ -95,7 +102,7 @@ void turnRadiansLeft(float radians)
 void turnRadians(float radians, char dir)
 {
     int wheelDiameterMm = 66;
-    float arcLength = radians * (155 / 2);
+    float arcLength = radians * (150 / 2);
     float rotations = (arcLength / (wheelDiameterMm * M_PI));
     int polaritySwaps = (rotations * 192);
 
@@ -119,8 +126,17 @@ void turnRadians(float radians, char dir)
 void driveToObstacle()
 {
     sensor.init(true);
-    printf("Initialisation completed!\r\n");
     sensor.setTimeout(500);
-    int dist = sensor.readRangeSingleMillimeters();
-    driveStraightDist(dist - 100);
+    int* dist = new int[3];
+    
+    for (int i = 0; i < 3; i++){
+        dist[i] = sensor.readRangeSingleMillimeters();
+    }
+    int distance;
+    for (int i = 0; i < 3; i++){
+        distance += dist[i];
+    }
+    distance = distance/3;
+    driveStraightDist(distance - 100);
+    delete dist;
 }
