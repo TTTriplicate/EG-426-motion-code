@@ -110,7 +110,7 @@ void findForwardGap()
         robo.rightFWD(.25);
         count = (hall_sensor.get_countB() + hall_sensor.get_countA())/2;
         int read = sensor.readRangeSingleMillimeters();
-        distanceAndHeading.push_back(std::make_pair(count * -1, read));
+        distanceAndHeading.push_back(std::make_pair(read, count * -1));
         ThisThread::sleep_for(10ms);
     }
     robo.stop();
@@ -133,10 +133,12 @@ void findForwardGap()
         robo.rightREV(.25);
         count = (hall_sensor.get_countB() + hall_sensor.get_countA())/2;
         int read = sensor.readRangeSingleMillimeters();
-        distanceAndHeading.push_back(std::make_pair(count, read));
+        distanceAndHeading.push_back(std::make_pair(read, count));
         ThisThread::sleep_for(10ms);
     }
     robo.stop();
+    ThisThread::sleep_for(500ms);
+    hall_sensor.resetAll();
     int maxDist = distanceAndHeading[0].first;
     int headingCount;
 
@@ -149,7 +151,9 @@ void findForwardGap()
     }
 
     int finalCount = (headingCount > 0 ? counts - headingCount : counts + abs(headingCount));
+    printf("final count: %d\n", finalCount);
     count = 0;
+
         while (count < finalCount)
     {
         robo.leftREV(.27);
