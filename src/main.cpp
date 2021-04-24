@@ -32,7 +32,7 @@ int main()
 {
     ThisThread::sleep_for(3s);
     findForwardGap();
-    driveStraightDist(1000);    
+    driveStraightDist(1000);
 }
 
 void output()
@@ -106,11 +106,11 @@ void findForwardGap()
     int count = 0;
     while (count < counts)
     {
-        robo.leftREV(.27);
-        robo.rightFWD(.25);
-        count = (hall_sensor.get_countB() + hall_sensor.get_countA())/2;
+        robo.turnLeft(.25);
+        count = (hall_sensor.get_countB() + hall_sensor.get_countA()) / 2;
         int read = sensor.readRangeSingleMillimeters();
-        distanceAndHeading.push_back(std::make_pair(read, count * -1));
+        if (read > 1000)
+            distanceAndHeading.push_back(std::make_pair(read, count * -1));
         ThisThread::sleep_for(10ms);
     }
     robo.stop();
@@ -119,21 +119,21 @@ void findForwardGap()
     count = 0;
     while (count < counts)
     {
-        robo.leftFWD(.27);
-        robo.rightREV(.25);
-        count = (hall_sensor.get_countB() + hall_sensor.get_countA())/2;
+        robo.turnRight(.25);
+        count = (hall_sensor.get_countB() + hall_sensor.get_countA()) / 2;
         ThisThread::sleep_for(10);
     }
     robo.stop();
     ThisThread::sleep_for(500);
     hall_sensor.resetAll();
     count = 0;
-    while (count < counts){
-                robo.leftFWD(.27);
-        robo.rightREV(.25);
-        count = (hall_sensor.get_countB() + hall_sensor.get_countA())/2;
+    while (count < counts)
+    {
+        robo.turnRight(.25);
+        count = (hall_sensor.get_countB() + hall_sensor.get_countA()) / 2;
         int read = sensor.readRangeSingleMillimeters();
-        distanceAndHeading.push_back(std::make_pair(read, count));
+        if (read > 1000)
+            distanceAndHeading.push_back(std::make_pair(read, count));
         ThisThread::sleep_for(10ms);
     }
     robo.stop();
@@ -142,9 +142,11 @@ void findForwardGap()
     int maxDist = distanceAndHeading[0].first;
     int headingCount;
 
-    for (unsigned i = 1; i < distanceAndHeading.size(); i++){
+    for (unsigned i = 1; i < distanceAndHeading.size(); i++)
+    {
         printf("%d : %d\n", distanceAndHeading[i].first, distanceAndHeading[i].second);
-        if (distanceAndHeading[i].first > maxDist){
+        if (distanceAndHeading[i].first > maxDist)
+        {
             maxDist = distanceAndHeading[i].first;
             headingCount = distanceAndHeading[i].second;
         }
@@ -154,11 +156,11 @@ void findForwardGap()
     printf("final count: %d\n", finalCount);
     count = 0;
 
-        while (count < finalCount)
+    while (count < finalCount)
     {
         robo.leftREV(.27);
         robo.rightFWD(.25);
-        count = (hall_sensor.get_countB() + hall_sensor.get_countA())/2;
+        count = (hall_sensor.get_countB() + hall_sensor.get_countA()) / 2;
         ThisThread::sleep_for(10);
     }
     robo.stop();
@@ -176,6 +178,6 @@ int countToDrive(int dist)
 
 int arcLength(float radians)
 {
-    int dist = radians * (150/2);
+    int dist = radians * (150 / 2);
     return dist;
 }
