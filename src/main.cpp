@@ -27,6 +27,7 @@ void driveToObstacle();
 void findForwardGap();
 int countToDrive(int dist);
 int arcLength(float radians);
+int rangeFinder();
 
 int main()
 {
@@ -46,8 +47,7 @@ void driveStraightDist(int dist)
     printf("Pole swaps: \t%d\n", polaritySwaps);
     while ((hall_sensor.get_countA() + hall_sensor.get_countB()) / 2 < polaritySwaps)
     {
-        robo.leftFWD(.27);
-        robo.rightFWD(.25);
+        robo.drive(.25);
         ThisThread::sleep_for(10);
     }
     robo.stop();
@@ -79,22 +79,8 @@ void turnRadians(float radians, char dir)
 
 void driveToObstacle()
 {
-    sensor.init(true);
-    sensor.setTimeout(500);
-    int *dist = new int[3];
-
-    for (int i = 0; i < 3; i++)
-    {
-        dist[i] = sensor.readRangeSingleMillimeters();
-    }
-    int distance;
-    for (int i = 0; i < 3; i++)
-    {
-        distance += dist[i];
-    }
-    distance = distance / 3;
+    distance = rangeFinder();
     driveStraightDist(distance - 150);
-    delete dist;
 }
 
 void findForwardGap()
@@ -180,4 +166,25 @@ int arcLength(float radians)
 {
     int dist = radians * (150 / 2);
     return dist;
+}
+
+int rangeFinder()
+{
+    sensor.init(true);
+    sensor.setTimeout(500);
+
+    int *dist = new int[3];
+    for (int i = 0; i < 3; i++)
+    {
+        dist[i] = sensor.readRangeSingleMillimeters();
+    }
+    int distance;
+    for (int i = 0; i < 3; i++)
+    {
+        distance += dist[i];
+    }
+    distance = distance / 3;
+
+    delete dist;
+    return distance;
 }
