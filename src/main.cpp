@@ -79,7 +79,7 @@ void turnRadians(float radians, char dir)
 
 void driveToObstacle()
 {
-    distance = rangeFinder();
+    int distance = rangeFinder();
     driveStraightDist(distance - 150);
 }
 
