@@ -22,6 +22,7 @@ void driveStraightDist(int dist);
 void turnRadiansRight(float radians);
 void turnRadiansLeft(float radians);
 void turnRadians(float radians, char dir);
+void identifyTurn();
 void driveToObstacle();
 
 int main()
@@ -34,15 +35,10 @@ int main()
     //     ThisThread::sleep_for(3s);
     // }
     driveToObstacle();
-    turnRadians(M_PI / 2, 'l');
+    identifyTurn();
     driveToObstacle();
-    turnRadians(M_PI / 2, 'r');
-    driveToObstacle();
-    turnRadians(M_PI, 'l');
-    driveToObstacle();
-    turnRadians(M_PI/2, 'l');
-    driveStraightDist(1000);
-    turnRadians(2 * M_PI, 'r');
+    identifyTurn();
+    driveStraightDist(500);
 }
 
 void output()
@@ -58,8 +54,7 @@ void driveStraightDist(int dist)
     printf("Pole swaps: \t%d\n", polaritySwaps);
     while ((hall_sensor.get_countA() + hall_sensor.get_countB()) / 2 < polaritySwaps)
     {
-        robo.leftFWD(.27);
-        robo.rightFWD(.25);
+        robo.drive(.3);
         ThisThread::sleep_for(10);
     }
     robo.stop();
@@ -115,11 +110,11 @@ void turnRadians(float radians, char dir)
     {
         if (dir == 'l')
         {
-            robo.turnLeft(.25);
+            robo.turnLeft(.3);
         }
         else if (dir == 'r')
         {
-            robo.turnRight(.25);
+            robo.turnRight(.3);
         }
         ThisThread::sleep_for(10);
     }
@@ -144,4 +139,34 @@ void driveToObstacle()
     distance = distance/3;
     driveStraightDist(distance - 150);
     delete dist;
+}
+
+void identifyTurn(){
+        sensor.init(true);
+    sensor.setTimeout(500);
+
+    turnRadians(M_PI/2, 'l');
+    int* dist = new int[3];
+    for (int i = 0; i < 3; i++){
+        dist[i] = sensor.readRangeSingleMillimeters();
+    }
+    int distanceLeft;
+    for (int i = 0; i < 3; i++){
+        distanceLeft += dist[i];
+    }
+    distanceLeft = distanceLeft/3;
+
+    turnRadians(M_PI, 'r');
+        for (int i = 0; i < 3; i++){
+        dist[i] = sensor.readRangeSingleMillimeters();
+    }
+    int distanceRight;
+    for (int i = 0; i < 3; i++){
+        distanceRight += dist[i];
+    }
+    distanceRight = distanceRight/3;
+
+    if (distanceLeft > distanceRight){
+        turnRadians(M_PI, 'l');
+    }
 }
