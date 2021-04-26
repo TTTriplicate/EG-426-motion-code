@@ -89,6 +89,7 @@ void findForwardGap()
     sensor.setTimeout(500);
     std::vector<std::pair<int, int>> distanceAndHeading;
     int counts = countToDrive(arcLength(M_PI / 2));
+    printf("90 degree turn counts: %d", counts);
     int count = 0;
     while (count < counts)
     {
@@ -125,18 +126,19 @@ void findForwardGap()
     robo.stop();
     ThisThread::sleep_for(500ms);
     hall_sensor.resetAll();
-    int maxDist = distanceAndHeading[0].first;
-    int headingCount;
+    int maxDist = 8191;
+    int headingCount = 0;
 
     for (unsigned i = 1; i < distanceAndHeading.size(); i++)
     {
         printf("%d : %d\n", distanceAndHeading[i].first, distanceAndHeading[i].second);
-        if (distanceAndHeading[i].first > maxDist)
+        if (distanceAndHeading[i].first <maxDist)
         {
             maxDist = distanceAndHeading[i].first;
             headingCount = distanceAndHeading[i].second;
         }
     }
+    printf("heading to gap relative to start: %d\n", headingCount);
 
     int finalCount = (headingCount > 0 ? counts - headingCount : counts + abs(headingCount));
     printf("final count: %d\n", finalCount);
@@ -144,8 +146,7 @@ void findForwardGap()
 
     while (count < finalCount)
     {
-        robo.leftREV(.27);
-        robo.rightFWD(.25);
+        robo.turnLeft(.3);
         count = (hall_sensor.get_countB() + hall_sensor.get_countA()) / 2;
         ThisThread::sleep_for(10);
     }
